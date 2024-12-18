@@ -3,7 +3,6 @@ package com.example.batch_reader.controller;
 import com.example.batch_reader.model.Transaction;
 import com.example.batch_reader.util.BatchJobService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,29 +17,21 @@ public class TransactionController {
     private BatchJobService batchJobService;
 
     @PostMapping("/process")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile[] files) {
+    public String processFile(@RequestParam("file") MultipartFile files) {
         System.out.println("SSSSS");
         try {
-            if (files.length == 0) {
-                return ResponseEntity.badRequest().body("No files uploaded");
-            }
 
-            // Process each file
-            for (MultipartFile file : files) {
-                if (file.isEmpty()) {
-                    return ResponseEntity.badRequest().body("One or more files are empty");
+                if (files.isEmpty()) {
+                    return ("One or more files are empty");
                 }
-
                 // Read the file input stream
-                InputStreamReader reader = new InputStreamReader(file.getInputStream());
+                InputStreamReader reader = new InputStreamReader(files.getInputStream());
                 List<Transaction> transactions = batchJobService.readTransactionsFromInputStream(reader);
                 batchJobService.saveTransactions(transactions);
-            }
-
-            return ResponseEntity.ok("Files uploaded and processed successfully");
+                return ("Files uploaded and processed successfully");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error processing file: " + e.getMessage());
+            return ("Error processing file: " + e.getMessage());
         }
     }
 
@@ -51,6 +42,7 @@ public class TransactionController {
 
     @GetMapping("/hello")
     public String list() {
+        System.out.println("SSSSS");
         return "Hello";
     }
 }
