@@ -10,9 +10,12 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     Page<Transaction> findAll(Pageable pageable);
 
     @Query("{ $or: [ " +
+            "{ 'tranId': { $regex: ?0, $options: 'i' } }, " +
             "{ 'customerId': { $regex: ?0, $options: 'i' } }, " +
             "{ 'accountNumber': { $regex: ?0, $options: 'i' } }, " +
             "{ 'description': { $regex: ?0, $options: 'i' } } " +
             "] }")
     Page<Transaction> findByKeyword(String keyword, Pageable pageable);
+
+    Transaction findByTranId(String TranId);
 }

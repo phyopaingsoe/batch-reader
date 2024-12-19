@@ -38,18 +38,25 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<Page<Transaction>> getTransactions(Pageable pageable) {
+    public ResponseEntity<List<Transaction>> getTransactions(Pageable pageable) {
         Page<Transaction> transactions = batchJobService.getPaginatedTransactions(pageable);
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(transactions.getContent());
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Transaction>> searchTransactions(
+    public ResponseEntity<List<Transaction>> searchTransactions(
             @RequestParam(value = "keyword") String keyword,
             Pageable pageable
     ) {
         Page<Transaction> transactions = batchJobService.searchTransactionsByKeyword(keyword, pageable);
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(transactions.getContent());
+    }
+
+    @PutMapping("/update/{tranId}")
+    public Transaction updateTransaction(
+            @PathVariable String tranId,
+            @RequestBody Transaction updatedRecord) {
+        return batchJobService.updateTransaction(tranId, updatedRecord);
     }
 
 }
