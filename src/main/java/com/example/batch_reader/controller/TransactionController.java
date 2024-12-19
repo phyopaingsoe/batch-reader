@@ -3,6 +3,9 @@ package com.example.batch_reader.controller;
 import com.example.batch_reader.model.Transaction;
 import com.example.batch_reader.util.BatchJobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +21,6 @@ public class TransactionController {
 
     @PostMapping("/process")
     public String processFile(@RequestParam("file") MultipartFile files) {
-        System.out.println("SSSSS");
         try {
 
                 if (files.isEmpty()) {
@@ -36,13 +38,18 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public List<Transaction> getAllTransactions() {
-        return batchJobService.retrieveAllTransactions();
+    public ResponseEntity<Page<Transaction>> getTransactions(Pageable pageable) {
+        Page<Transaction> transactions = batchJobService.getPaginatedTransactions(pageable);
+        return ResponseEntity.ok(transactions);
     }
 
-    @GetMapping("/hello")
-    public String list() {
-        System.out.println("SSSSS");
-        return "Hello";
+    @GetMapping("/search")
+    public ResponseEntity<Page<Transaction>> searchTransactions(
+            @RequestParam(value = "keyword") String keyword,
+            Pageable pageable
+    ) {
+        Page<Transaction> transactions = batchJobService.searchTransactionsByKeyword(keyword, pageable);
+        return ResponseEntity.ok(transactions);
     }
+
 }

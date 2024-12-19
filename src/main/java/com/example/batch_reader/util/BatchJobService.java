@@ -3,6 +3,8 @@ package com.example.batch_reader.util;
 import com.example.batch_reader.model.Transaction;
 import com.example.batch_reader.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -45,7 +47,11 @@ public class BatchJobService {
         transactionRepository.saveAll(transactions);
     }
 
-    public List<Transaction> retrieveAllTransactions() {
-        return transactionRepository.findAll();
+    public Page<Transaction> getPaginatedTransactions(Pageable pageable) {
+        return transactionRepository.findAll(pageable);
+    }
+
+    public Page<Transaction> searchTransactionsByKeyword(String keyword, Pageable pageable) {
+        return transactionRepository.findByKeyword(keyword, pageable);
     }
 }
