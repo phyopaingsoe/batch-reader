@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,19 +59,33 @@ public class BatchJobService {
         while (retryCount > 0) {
             try {
                 Transaction existingRecord = transactionRepository.findByTranId(tranId);
-                if(existingRecord == null)
-                {
+                if (existingRecord == null) {
                     throw new RuntimeException("Transaction Not Found!");
                 }
-                logger.info(String.valueOf(existingRecord));
-                existingRecord.setTrxAmount(updatedRecord.getTrxAmount());
-                existingRecord.setDescription(updatedRecord.getDescription());
-                existingRecord.setTrxDate(updatedRecord.getTrxDate());
-                existingRecord.setTrxTime(updatedRecord.getTrxTime());
-                existingRecord.setCustomerId(updatedRecord.getCustomerId());
+
+                logger.info("Existing record: {}", existingRecord);
+
+                if (updatedRecord.getTrxAmount() != null) {
+                    existingRecord.setTrxAmount(updatedRecord.getTrxAmount());
+                }
+                if (updatedRecord.getDescription() != null && !updatedRecord.getDescription().isEmpty()) {
+                    existingRecord.setDescription(updatedRecord.getDescription());
+                }
+                if (updatedRecord.getTrxDate() != null && !updatedRecord.getTrxDate().isEmpty()) {
+                    existingRecord.setTrxDate(updatedRecord.getTrxDate());
+                }
+                if (updatedRecord.getTrxTime() != null && !updatedRecord.getTrxTime().isEmpty()) {
+                    existingRecord.setTrxTime(updatedRecord.getTrxTime());
+                }
+                if (updatedRecord.getCustomerId() != null && !updatedRecord.getCustomerId().isEmpty()) {
+                    existingRecord.setCustomerId(updatedRecord.getCustomerId());
+                }
+
+                logger.info("Updated record: {}", existingRecord);
 
                 // Save updated record
                 return transactionRepository.save(existingRecord);
+
             } catch (OptimisticLockingFailureException e) {
                 retryCount--;
                 if (retryCount == 0) {

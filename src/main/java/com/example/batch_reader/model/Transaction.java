@@ -17,7 +17,7 @@ public class Transaction {
     @Indexed
     private String tranId;
     private String accountNumber;
-    private double trxAmount;
+    private Double trxAmount;
     private String description;
     private String trxDate;
     private String trxTime;
@@ -25,4 +25,8 @@ public class Transaction {
 
     @Version
     private Long version;
+
+    public Transaction() {
+
+    }
 }
