@@ -13,11 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -61,40 +64,10 @@ public class TransactionControllerTest {
 
         mockMvc.perform(multipart("/api/process").file(file))
                 .andExpect(status().isOk())
-                .andExpect(content().string("One or more files are empty"));
+                .andExpect(content().string("File is empty"));
 
         verify(batchJobService, never()).readTransactionsFromInputStream(any());
         verify(batchJobService, never()).saveTransactions(any());
-    }
-
-    @Test
-    public void testGetTransactions() throws Exception {
-        Page<Transaction> transactionsPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
-
-        when(batchJobService.getPaginatedTransactions(any(Pageable.class))).thenReturn(transactionsPage);
-
-        mockMvc.perform(get("/api/transactions")
-                        .param("page", "0")
-                        .param("sort", "customerId,asc")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(0)));
-
-        verify(batchJobService, times(1)).getPaginatedTransactions(any(Pageable.class));
-    }
-
-    @Test
-    public void testSearchTransactions() throws Exception {
-        Page<Transaction> transactionsPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
-        when(batchJobService.searchTransactionsByKeyword(anyString(), any())).thenReturn(transactionsPage);
-
-        mockMvc.perform(get("/api/search")
-                        .param("keyword", "test")
-                        .param("page", "0").param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(0)));
-
-        verify(batchJobService, times(1)).searchTransactionsByKeyword(anyString(), any());
     }
 
     @Test

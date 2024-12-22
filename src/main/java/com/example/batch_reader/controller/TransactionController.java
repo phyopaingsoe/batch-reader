@@ -23,14 +23,14 @@ public class TransactionController {
     public String processFile(@RequestParam("file") MultipartFile files) {
         try {
 
-                if (files.isEmpty()) {
-                    return ("One or more files are empty");
-                }
-                // Read the file input stream
-                InputStreamReader reader = new InputStreamReader(files.getInputStream());
-                List<Transaction> transactions = batchJobService.readTransactionsFromInputStream(reader);
-                batchJobService.saveTransactions(transactions);
-                return ("Files uploaded and processed successfully");
+            if (files.isEmpty()) {
+                return ("File is empty");
+            }
+            // Read the file input stream
+            InputStreamReader reader = new InputStreamReader(files.getInputStream());
+            List<Transaction> transactions = batchJobService.readTransactionsFromInputStream(reader);
+            batchJobService.saveTransactions(transactions);
+            return ("Files uploaded and processed successfully");
         } catch (Exception e) {
             e.printStackTrace();
             return ("Error processing file: " + e.getMessage());
